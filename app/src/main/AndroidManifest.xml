@@ -14,6 +14,7 @@
         android:theme="@style/AppTheme">
         <activity android:name=".RegisterTwoAct"></activity>
         <activity android:name=".LoginAct" />
+        <activity android:name=".HomeAct" />
         <activity android:name=".MainActivity" />
         <activity android:name=".RegisterAct">
             <intent-filter>
@@ -23,5 +24,6 @@
             </intent-filter>
         </activity>
     </application>
+
 
 </manifest>

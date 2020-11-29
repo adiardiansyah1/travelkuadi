@@ -17,12 +17,14 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 public class RegisterAct extends AppCompatActivity {
+
     Button next,back;
     EditText username, password, email;
 
     DatabaseReference reference;
     String USERNAME_KEY = "usernamekey";
     String username_key = "";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,45 +42,41 @@ public class RegisterAct extends AppCompatActivity {
         next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent gotonextregister = new Intent(RegisterAct.this, RegisterTwoAct.class);
+                //menyimpan data kepada local storage (handphone)
+                SharedPreferences sharedPreferences = getSharedPreferences(USERNAME_KEY, MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString(username_key, username.getText().toString());
+                editor.apply();
+
+                reference = FirebaseDatabase.getInstance().getReference()
+                        .child("Users").child(username.getText().toString());
+
+                reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange (@NonNull DataSnapshot dataSnapshot) {
+                        dataSnapshot.getRef().child("username").setValue(username.getText().toString());
+                        dataSnapshot.getRef().child("password").setValue(password.getText().toString());
+                        dataSnapshot.getRef().child("email").setValue(email.getText().toString());
+                        dataSnapshot.getRef().child("saldo").setValue(10000);
+                    }
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                    }
+                });
+                Intent gotonextregister = new Intent(com.example.travelkuadi.RegisterAct.this, RegisterTwoAct.class);
                 startActivity(gotonextregister);
             }
-        });
 
-        //menyimpan data kepada local storage (handphone)
-        SharedPreferences sharedPreferences = getSharedPreferences(USERNAME_KEY, MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(username_key, username.getText().toString()); //mengambil data inputan
-        editor.apply();
 
-        // simpan kepada database
-        reference = FirebaseDatabase.getInstance().getReference()
-                .child("Users").child(username.getText().toString());
-
-        reference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                dataSnapshot.getRef().child("username").setValue(username.getText().toString());
-                dataSnapshot.getRef().child("password").setValue(password.getText().toString());
-                dataSnapshot.getRef().child("email").setValue(email.getText().toString());
-                dataSnapshot.getRef().child("saldo").setValue(10000);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
         });
 
         //berpindah ke activity lain ke activity LOGINact
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent gotologin = new Intent(RegisterAct.this, LoginAct.class);
+                Intent gotologin = new Intent(com.example.travelkuadi.RegisterAct.this, LoginAct.class);
                 startActivity(gotologin);
             }
         });
-
 
     }
 }
